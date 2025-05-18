@@ -1,0 +1,34 @@
+services:
+  discord:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DOWNLOAD_LINK: "https://discordapp.com/api/download?platform=linux&format=deb"
+    image: discord
+    container_name: discord
+    privileged: true
+    environment:
+      - DISPLAY=%{DISPLAY}
+      - DBUS_SESSION_BUS_ADDRESS=unix:path=/var/run/user/1000/bus
+      - PULSE_SERVER=unix:/run/user/1000/pulse/native
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - discordSettings:/home/discord
+      - /dev/shm:/dev/shm:z
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/dbus:/var/run/dbus
+      - /var/run/user/${UID}/bus:/var/run/user/1000/bus
+      - /var/run/user/${UID}/pulse:/var/run/user/1000/pulse
+    devices:
+      - /dev/snd
+    group_add:
+     - "${AUDIO_GID}"
+    restart: "no"
+    stdin_open: true
+    tty: true
+    network_mode: host
+    user: "${UID}:${GID}"
+
+volumes:
+  discordSettings:
